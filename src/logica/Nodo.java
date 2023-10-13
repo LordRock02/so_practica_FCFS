@@ -2,14 +2,27 @@ package src.logica;
 
 public class Nodo{
   private int idNodo;
-  private int cantFacturas;
-  private String nombrePersona;
+  private String proceso;
+
+  private double tiempoLlegada;
+
+  private double tiempoComienzo;
+
+  private double tiempoFinal;
+
+  private double tiempoRetorno;
+
+  private double tiempoEspera;
+
+  private double rafaga;
   private Nodo siguiente;
+
+  private Nodo anterior;
 
   public Nodo(int id){
     this.idNodo = id;
-    this.nombrePersona = "Cliente #"+this.idNodo;
-    this.cantFacturas = (int)(Math.random()*20+1);
+    this.proceso = "Proceso #"+this.idNodo;
+    this.tiempoLlegada = id;
   }
 
   public int getIdNodo() {
@@ -20,12 +33,12 @@ public class Nodo{
     this.idNodo = idNodo;
   }
 
-  public String getNombrePersona() {
-    return nombrePersona;
+  public String getProceso() {
+    return proceso;
   }
 
-  public void setNombrePersona(String nombrePersona) {
-    this.nombrePersona = nombrePersona;
+  public void setProceso(String proceso) {
+    this.proceso = proceso;
   }
 
   public Nodo getSiguiente() {
@@ -36,11 +49,28 @@ public class Nodo{
     this.siguiente = siguiente;
   }
 
-  public int getCantFacturas() {
-    return cantFacturas;
-  }
+  public Nodo getAnterior(){ return this.anterior; }
 
-  public void setCantFacturas(int cantFacturas) {
-    this.cantFacturas = cantFacturas;
-  }
+  public void setAnterior(Nodo anterior){ this.anterior = anterior; }
+
+  public void setTiempoLlegada(double tiempoLlegada){ this.tiempoLlegada = tiempoLlegada; }
+
+  public double getTiempoLlegada() { return tiempoLlegada; }
+
+  public void setRafaga(double rafaga) { this.rafaga = rafaga; }
+
+  public double getRafaga() { return this.rafaga; }
+
+  public void setTiempoComienzo(double tiempoComienzo){ this.tiempoComienzo = tiempoComienzo; }
+
+  public void setTiempoFinal(double tiempoFinal){ this.tiempoFinal = tiempoFinal; }
+
+  public double getTiempoFinal(){ return this.tiempoFinal; }
+
+  public void setTiempoRetorno(double tiempoRetorno){ this.tiempoRetorno = tiempoRetorno; }
+
+  public double getTiempoRetorno(){ return this.tiempoRetorno; }
+
+  public void setTiempoEspera(double tiempoEspera){ this.tiempoEspera=tiempoEspera; }
+
 }
