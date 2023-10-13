@@ -28,7 +28,7 @@ public class GanttChartExample extends JFrame {
                 "Gantt Chart Example", // Chart title
                 "Software Development Phases", // X-Axis Label
                 "Timeline", // Y-Axis Label
-                dataset);
+                dataset, true, true, true);
 
         ChartPanel panel = new ChartPanel(chart);
         setContentPane(panel);
@@ -60,7 +60,7 @@ public class GanttChartExample extends JFrame {
 
         TaskSeries series2 = new TaskSeries("Actual Date");
         series2.add(new Task("Requirement",Date.from(LocalDate.of(2017, 7,3).atStartOfDay().toInstant(ZoneOffset.UTC)),
-                Date.from(LocalDate.of(2017, 7, 05).atStartOfDay().toInstant(ZoneOffset.UTC))
+                Date.from(LocalDate.of(2017, 7, 7).atStartOfDay().toInstant(ZoneOffset.UTC))
         ));
 
         series2.add(new Task("Design",
