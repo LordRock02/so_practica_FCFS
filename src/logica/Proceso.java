@@ -3,6 +3,7 @@ package src.logica;
 public class Proceso{
 
     private String nombreProceso;
+    private Nodo<Proceso> nodo;
     private int estado;
     private double tiempoLlegada;
     private double rafaga;
@@ -13,72 +14,44 @@ public class Proceso{
 
     public static int NUEVO = 0, LISTO = 1, EJECUCION = 2, BLOQUEADO = 3, TERMINADO = 4;
 
-    Proceso(int id) {
+    public Proceso(int id) {
         this.nombreProceso="Proceso# " + id;
         this.estado = NUEVO;
     }
 
-    public String getNombreProceso() {
-        return nombreProceso;
-    }
+    public String getNombreProceso() { return nombreProceso; }
 
-    public void setNombreProceso(String nombreProceso) {
-        this.nombreProceso = nombreProceso;
-    }
+    public void setNombreProceso(String nombreProceso) { this.nombreProceso = nombreProceso; }
 
-    public int getEstado() {
-        return estado;
-    }
+    public Nodo<Proceso> getNodo() { return this.nodo; }
 
-    public void setEstado(int estado) {
-        this.estado = estado;
-    }
+    public void setNodo(Nodo<Proceso> nodo) { this.nodo = nodo; }
 
-    public double getTiempoLlegada() {
-        return tiempoLlegada;
-    }
+    public int getEstado() { return estado; }
 
-    public void setTiempoLlegada(double tiempoLlegada) {
-        this.tiempoLlegada = tiempoLlegada;
-    }
+    public void setEstado(int estado) { this.estado = estado; }
 
-    public double getRafaga() {
-        return rafaga;
-    }
+    public double getTiempoLlegada() {  return tiempoLlegada; }
 
-    public void setRafaga(double rafaga) {
-        this.rafaga = rafaga;
-    }
+    public void setTiempoLlegada(double tiempoLlegada) { this.tiempoLlegada = tiempoLlegada; }
 
-    public double getTiempoComienzo() {
-        return tiempoComienzo;
-    }
+    public double getRafaga() { return rafaga; }
 
-    public void setTiempoComienzo(double tiempoComienzo) {
-        this.tiempoComienzo = tiempoComienzo;
-    }
+    public void setRafaga(double rafaga) { this.rafaga = rafaga; }
 
-    public double getTiempoFinal() {
-        return tiempoFinal;
-    }
+    public double getTiempoComienzo() { return tiempoComienzo;  }
 
-    public void setTiempoFinal(double tiempoFinal) {
-        this.tiempoFinal = tiempoFinal;
-    }
+    public void setTiempoComienzo(double tiempoComienzo) { this.tiempoComienzo = tiempoComienzo; }
 
-    public double getTiempoRetorno() {
-        return tiempoRetorno;
-    }
+    public double getTiempoFinal() { return tiempoFinal; }
 
-    public void setTiempoRetorno(double tiempoRetorno) {
-        this.tiempoRetorno = tiempoRetorno;
-    }
+    public void setTiempoFinal(double tiempoFinal) { this.tiempoFinal = tiempoFinal; }
 
-    public double getTiempoEspera() {
-        return tiempoEspera;
-    }
+    public double getTiempoRetorno() { return tiempoRetorno; }
 
-    public void setTiempoEspera(double tiempoEspera) {
-        this.tiempoEspera = tiempoEspera;
-    }
+    public void setTiempoRetorno(double tiempoRetorno) { this.tiempoRetorno = tiempoRetorno; }
+
+    public double getTiempoEspera() { return tiempoEspera; }
+
+    public void setTiempoEspera(double tiempoEspera) { this.tiempoEspera = tiempoEspera; }
 }

@@ -6,7 +6,14 @@ public class Nodo<T>{
 
     private Nodo<T> siguiente;
     private int id;
-    Nodo(int id){
+    Nodo(){
+
+    }
+    Nodo(T dato){
+        this.dato=dato;
+    }
+    Nodo(T dato, int id){
+        this(dato);
         this.id=id;
     }
     public void setDato(T dato){ this.dato = dato; }
