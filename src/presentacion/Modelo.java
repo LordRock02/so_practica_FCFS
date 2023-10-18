@@ -7,16 +7,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
+
 public class Modelo {
 
+    int contadorReloj =0;
+    int cicloReloj = 1000;
+
     private Lista listaTurnos = new Lista();
+    private Lista listaBloqueados = new Lista();
     private VentanaPrincipal ventanaPrincipal;
 
     Thread hiloAtender;
     Thread hiloPintarTabla;
     Thread hiloPintarCola;
-
-    int cicloReloj = 200;
+    Thread hiloAtencionBloqueados;
     boolean sistemaActivo = false;
 
     private int[][] coordenadas = {
@@ -46,11 +50,11 @@ public class Modelo {
         getVistaPrincipal().getPanelCola().setBackground(Color.red);
         getVistaPrincipal().getPanelTabla().setBackground(Color.blue);
         this.insertarClientesIniciales();
-
     }
 
     public void insertarClientesIniciales(){
-        int cantClientes = (int)(Math.random()*10+1);
+        //int cantClientes = (int)(Math.random()*10+1);
+        int cantClientes = 5;
         for(int i=0;i<cantClientes;i++){
             this.listaTurnos.insertar();
         }
@@ -63,16 +67,76 @@ public class Modelo {
             @Override
             public void run() {
                 while(isSistemaActivo()){
-                    try {
-                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
-                        System.out.println("Atendiendo cada 100 ms");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    listaTurnos.imprimirLista();
+                    while(listaTurnos.getProcesoCajero().getSiguiente() != listaTurnos.getProcesoCajero()){
+                        Proceso procesoActual = listaTurnos.getProcesoCajero().getSiguiente();
+                        System.out.println("Actual: "+procesoActual.getIdProceso());
+                        boolean eliminadoPorBloqueo = false;
+                        int limiteFor = procesoActual.getRafagaRestante();
+                        System.out.println("Limite for: "+procesoActual.getRafagaRestante());
+                        for(int i=0;i<limiteFor;i++){
+                            System.out.println("Ciclo "+(i+1)+ " de proceso " +procesoActual.getIdProceso() + " rafaga "+procesoActual.getRafagaRestante());
+                            try {
+                                Thread.sleep(cicloReloj);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            procesoActual.setRafagaRestante(procesoActual.getRafagaRestante()-1);
+
+                            int numRandom = (int)(Math.random()*100+1);
+                            if(numRandom%7 == 0 && procesoActual.getRafagaRestante()>0){
+                                System.out.println("Proceso bloqueado");
+                                procesoActual.setEstado("Bloqueado");
+
+                                procesoActual.setTiempoBloqueo((int)(Math.random()*6+3));
+                                listaTurnos.atender();
+                                eliminadoPorBloqueo = true;
+                                listaBloqueados.insertar(procesoActual);
+                                System.out.println("rompe break");
+                                break;
+                            }
+
+                        }
+                        System.out.println("Atiende");
+                        if(!eliminadoPorBloqueo){
+                            listaTurnos.atender();
+                        }
                     }
+
+                    contadorReloj++;
                 }
             }
         });
         hiloAtender.start();
+    }
+
+    public void iniciarAtencionBloqueados(){
+        hiloAtencionBloqueados = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(isSistemaActivo()){
+                    try {
+                        Thread.sleep(cicloReloj);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    ArrayList<Proceso> procesosBloqueados = listaBloqueados.listarNodos();
+                    for(int i = 0; i< procesosBloqueados.size(); i++){
+                        Proceso proceso = procesosBloqueados.get(i);
+
+                        if(proceso.getTiempoBloqueo()==1){
+                            listaBloqueados.removerProcesoEspecifico(proceso);
+                            listaTurnos.insertar(proceso);
+                        }
+                        else if(proceso.getTiempoBloqueo()>1){
+                            proceso.setTiempoBloqueo(proceso.getTiempoBloqueo()-1);
+                        }
+                    }
+                }
+            }
+        });
+        hiloAtencionBloqueados.start();
     }
 
     public void iniciarPintarCola(){
@@ -81,11 +145,12 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo()){
                     try {
-                        Thread.sleep(200); // Agregar un retraso de 200 ms entre cada elemento
-                        System.out.println("Pintando cola cada 200 ms");
+                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    pintarCola();
                 }
             }
         });
@@ -96,13 +161,15 @@ public class Modelo {
         hiloPintarTabla = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(isSistemaActivo()){
+                while(isSistemaActivo() ){
                     try {
-                        Thread.sleep(300); // Agregar un retraso de 200 ms entre cada elemento
-                        System.out.println("Pintando tabla cada 300 ms");
+
+                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
+
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    pintarTabla();
                 }
             }
         });
@@ -114,8 +181,8 @@ public class Modelo {
         for(int i=0;i<cantidadAgregar;i++){
             this.listaTurnos.insertar();
         }
-        this.pintarTabla();
-        this.pintarCola();
+        pintarTabla();
+        pintarCola();
     }
 
     public void atenderCliente(){
@@ -130,14 +197,26 @@ public class Modelo {
     public void pintarTabla(){
 
         ArrayList<Proceso> procesos = listaTurnos.listarNodos();
-        this.getVistaPrincipal().getModelTable().setRowCount(0);
+        this.getVistaPrincipal().getModelTablaTiempos().setRowCount(0);
 
         for(int i = 0; i< procesos.size(); i++){
             Proceso proceso = procesos.get(i);
-            this.getVistaPrincipal().getModelTable().addRow(new Object[]{
+            this.getVistaPrincipal().getModelTablaTiempos().addRow(new Object[]{
                     proceso.getIdNodo(),
                     proceso.getTiempoLlegada(),
                     proceso.getRafaga()
+            });
+        }
+
+        ArrayList<Proceso> procesosBloqueados = listaBloqueados.listarNodos();
+        this.getVistaPrincipal().getModelTablaBloqueado().setRowCount(0);
+
+        for(int i = 0; i< procesosBloqueados.size(); i++){
+            Proceso proceso = procesosBloqueados.get(i);
+            this.getVistaPrincipal().getModelTablaBloqueado().addRow(new Object[]{
+                    proceso.getIdNodo(),
+                    proceso.getTiempoBloqueo(),
+                    proceso.getRafagaRestante()
             });
         }
     }

@@ -4,11 +4,17 @@ public class Proceso {
   private Proceso siguiente;
   private String nombreProceso;
   private int idProceso,tiempoLlegada,rafaga,tiempoComienzo,tiempoFinal,tiempoRetorno,tiempoEspera;
+  private String estado;
+  private int rafagaRestante;
+  private int tiempoBloqueo;
 
   public Proceso(int id){
     this.idProceso = id;
-    this.rafaga= (int)(Math.random()*20+1);
+    this.rafaga= (int)(Math.random()*10+1);
+    this.rafagaRestante=this.rafaga;
     this.tiempoLlegada = (int)(Math.random()*10+1);
+    this.estado= "Nuevo";
+    this.tiempoBloqueo=0;
   }
 
   public int getIdNodo() {
@@ -85,5 +91,29 @@ public class Proceso {
 
   public void setTiempoEspera(int tiempoEspera) {
     this.tiempoEspera = tiempoEspera;
+  }
+
+  public String getEstado() {
+    return estado;
+  }
+
+  public void setEstado(String estado) {
+    this.estado = estado;
+  }
+
+  public int getRafagaRestante() {
+    return rafagaRestante;
+  }
+
+  public void setRafagaRestante(int rafagaRestante) {
+    this.rafagaRestante = rafagaRestante;
+  }
+
+  public int getTiempoBloqueo() {
+    return tiempoBloqueo;
+  }
+
+  public void setTiempoBloqueo(int tiempoBloqueo) {
+    this.tiempoBloqueo = tiempoBloqueo;
   }
 }

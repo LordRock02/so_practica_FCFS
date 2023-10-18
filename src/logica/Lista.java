@@ -14,7 +14,7 @@ public class Lista {
   public void insertar() {
     tamano++;
     Proceso procesoNuevo = new Proceso(tamano);
-    Proceso procesoAuxiliar = procesoCajero.getSiguiente();
+    Proceso procesoAuxiliar = procesoCajero;
     while (procesoAuxiliar.getSiguiente() != procesoCajero) {
       procesoAuxiliar = procesoAuxiliar.getSiguiente();
     }
@@ -23,43 +23,62 @@ public class Lista {
  
   }
 
+  public void removerProcesoEspecifico(Proceso procesoRemover){
+    Proceso procesoAuxiliar = procesoCajero;
+    while (procesoAuxiliar.getSiguiente() != procesoCajero) {
+      if(procesoAuxiliar.getSiguiente()==procesoRemover){
+        procesoAuxiliar.setSiguiente(procesoRemover.getSiguiente());
+        tamano--;
+        return;
+      }
+      procesoAuxiliar = procesoAuxiliar.getSiguiente();
+    }
+  }
+
+  public void insertar(Proceso procesoNuevo){
+    tamano++;
+    Proceso procesoAuxiliar = procesoCajero;
+    while (procesoAuxiliar.getSiguiente() != procesoCajero) {
+      procesoAuxiliar = procesoAuxiliar.getSiguiente();
+    }
+    procesoAuxiliar.setSiguiente(procesoNuevo);
+    procesoNuevo.setSiguiente(procesoCajero);
+  }
+
   public ArrayList<Proceso> listarNodos(){
     ArrayList<Proceso> procesos = new ArrayList<Proceso>();
-    Proceso procesoAuxiliar = procesoCajero.getSiguiente();
-    while (procesoAuxiliar != procesoCajero) {
-      procesos.add(procesoAuxiliar);
+    Proceso procesoAuxiliar = procesoCajero;
+    while (procesoAuxiliar.getSiguiente() != procesoCajero) {
+      procesos.add(procesoAuxiliar.getSiguiente());
       procesoAuxiliar = procesoAuxiliar.getSiguiente();
     }
     return procesos;
   }
 
   public void atender(){
-    if(procesoCajero.getSiguiente() != procesoCajero){
+    Proceso procesoAtendido = procesoCajero.getSiguiente();
+    procesoCajero.setSiguiente(procesoAtendido.getSiguiente());
+    this.tamano--;
+  }
 
-      Proceso procesoAtendido = procesoCajero.getSiguiente();
-
-      int cantFacturas = procesoAtendido.getRafaga();
-
-      if(cantFacturas>5){
-        procesoAtendido.setRafaga(procesoAtendido.getRafaga()-5);
-        procesoCajero.setSiguiente(procesoAtendido.getSiguiente());
-
-        Proceso procesoAuxiliar = procesoCajero.getSiguiente();
-        while (procesoAuxiliar.getSiguiente() != procesoCajero) {
-          procesoAuxiliar = procesoAuxiliar.getSiguiente();
-        }
-        procesoAtendido.setSiguiente(procesoAuxiliar.getSiguiente());
-        procesoAuxiliar.setSiguiente(procesoAtendido);;
-
-      }
-      else{
-        procesoCajero.setSiguiente(procesoAtendido.getSiguiente());
-        this.tamano--;
-      }
+  public void imprimirLista(){
+    String lista = "";
+    Proceso procesoAuxiliar = procesoCajero;
+    while (procesoAuxiliar.getSiguiente() != procesoCajero) {
+      lista += " "+procesoAuxiliar.getSiguiente().getIdProceso();
+      procesoAuxiliar = procesoAuxiliar.getSiguiente();
     }
+
+    System.out.println(lista);
   }
 
   public int getTamano() {
     return tamano;
   }
+
+  public Proceso getProcesoCajero(){
+    return this.procesoCajero;
+  }
+
+
 }

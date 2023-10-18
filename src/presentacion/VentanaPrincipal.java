@@ -136,7 +136,7 @@ public class VentanaPrincipal extends JFrame {
         modelTablaBloqueado = new DefaultTableModel();
 
         modelTablaBloqueado.addColumn("Proceso");
-        modelTablaBloqueado.addColumn("T.Llegada");
+        modelTablaBloqueado.addColumn("T.Bloqueo");
         modelTablaBloqueado.addColumn("Rafaga");
 
         tablaBloqueados = new JTable(modelTablaBloqueado);
@@ -171,8 +171,12 @@ public class VentanaPrincipal extends JFrame {
         this.add(panelTabla);
     }
 
-    public DefaultTableModel getModelTable() {
+    public DefaultTableModel getModelTablaTiempos() {
         return modelTablaTiempos;
+    }
+
+    public DefaultTableModel getModelTablaBloqueado() {
+        return modelTablaBloqueado;
     }
 
     public JPanel getPanelCola() {
