@@ -11,11 +11,14 @@ import org.jfree.ui.RefineryUtilities;
 
 import src.gantt_chart_mod.GanttChartFactory;
 import src.gantt_chart_mod.TaskNumeric;
+import src.gantt_chart_mod.MyRenderer;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GanttDemo extends ApplicationFrame {
+
+    MyRenderer myRenderer;
 
     public GanttDemo(String s) {
         super(s);
@@ -30,11 +33,14 @@ public class GanttDemo extends ApplicationFrame {
         return chart;
     }
 
-    private static IntervalCategoryDataset createDataset() {
+    private static TaskSeriesCollection  createDataset() {
         TaskSeries taskseries = new TaskSeries("Scheduled");
 
         Task task = new TaskNumeric("task1", 0, 5);
-        task.setPercentComplete(1.0D);
+        Task t01 = new TaskNumeric("Esperando", 0, 2);
+        Task t02 = new TaskNumeric("Ejecutando", 3, 5);
+        task.addSubtask(t01);
+        task.addSubtask(t02);
         taskseries.add(task);
         Task task1 = new TaskNumeric("task2", 2,9);
         taskseries.add(task1);

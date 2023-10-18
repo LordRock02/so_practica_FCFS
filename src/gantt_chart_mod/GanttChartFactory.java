@@ -14,6 +14,7 @@ import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.GanttRenderer;
 import org.jfree.chart.urls.StandardCategoryURLGenerator;
 import org.jfree.data.category.IntervalCategoryDataset;
+import org.jfree.data.gantt.TaskSeriesCollection;
 
 import java.text.NumberFormat;
 
@@ -23,13 +24,13 @@ public class GanttChartFactory extends ChartFactory {
 
     public static JFreeChart createGanttChart(String title,
                                               String categoryAxisLabel, String valueAxisLabel,
-                                              IntervalCategoryDataset dataset, boolean legend, boolean tooltips,
+                                              TaskSeriesCollection dataset, boolean legend, boolean tooltips,
                                               boolean urls) {
 
         CategoryAxis categoryAxis = new CategoryAxis(categoryAxisLabel);
         ValueAxis valueAxis = new NumberAxis(valueAxisLabel);
 
-        CategoryItemRenderer renderer = new GanttRenderer();
+        CategoryItemRenderer renderer = new MyRenderer(dataset);
         if (tooltips) {
             renderer.setDefaultToolTipGenerator(
                     new IntervalCategoryToolTipGenerator(
