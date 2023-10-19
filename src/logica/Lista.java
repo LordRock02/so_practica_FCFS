@@ -84,6 +84,11 @@ public class Lista {
 
     System.out.println(lista);
   }
+
+  public int getContador() {
+    return contador;
+  }
+
   public boolean isEmpty(){
     return (this.procesoCajero.getSiguiente()==this.procesoCajero);
   }

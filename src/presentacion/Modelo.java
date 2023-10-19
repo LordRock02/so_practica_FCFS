@@ -12,6 +12,7 @@ import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.time.SimpleTimePeriod;
+import org.jfree.data.time.TimePeriod;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +76,7 @@ public class Modelo {
     }
     public void agregarCliente(){
         int cantidadAgregar = Integer.parseInt(this.getVistaPrincipal().getTxtCantClientes().getText());
-        Object[] datos = new Object[8];
+        Object[] datos = new Object[9];
         Proceso proceso;
         for(int i=0;i<cantidadAgregar;i++){
             this.listaTurnos.insertar();
@@ -90,6 +91,7 @@ public class Modelo {
             datos[5]=proceso.getTiempoRetorno();
             datos[6]=proceso.getTiempoEspera();
             datos[7]="esperando";
+            datos[8]=proceso.getIdProceso();
             this.procesosIngresados.add(datos);
         }
         pintarTabla();
@@ -107,7 +109,7 @@ public class Modelo {
         ArrayList<Proceso> procesos = this.listaTurnos.listarNodos();
         //System.out.println("INSERTARCLIENTESINICIALES tamano:" + procesos.size());
         for(int i=0; i<procesos.size(); i++){
-            Object[] datos = new Object[8];
+            Object[] datos = new Object[9];
             //System.out.println("Proceso #: " + procesos.get(i).getIdProceso());
             datos[0]=procesos.get(i).getNombreProceso();
             datos[1]=procesos.get(i).getTiempoLlegada();
@@ -117,6 +119,7 @@ public class Modelo {
             datos[5]=procesos.get(i).getTiempoRetorno();
             datos[6]=procesos.get(i).getTiempoEspera();
             datos[7]="esperando";//procesos.get(i).getEstado();
+            datos[8]=procesos.get(i).getIdProceso();
             this.procesosIngresados.add(datos);
         }
         this.pintarCola();
@@ -258,7 +261,7 @@ public class Modelo {
                             listaBloqueados.atender(proceso);
                             listaTurnos.insertar(proceso);
                             listaTurnos.getUltimoEnLista().setNombreProceso(listaTurnos.getUltimoEnLista().getNombreProceso()+"'");
-                            Object[] datos = new Object[8];
+                            Object[] datos = new Object[9];
                             datos[0]=listaTurnos.getUltimoEnLista().getNombreProceso();
                             datos[1]=contadorCiclo;
                             datos[2]=listaTurnos.getUltimoEnLista().getRafagaRestante();
@@ -267,6 +270,7 @@ public class Modelo {
                             datos[5]=0;
                             datos[6]=0;
                             datos[7]=listaTurnos.getUltimoEnLista().getEstado();
+                            datos[8]=listaTurnos.getUltimoEnLista().getIdProceso();
                             procesosIngresados.add(datos);
                         }
                         else if(proceso.getTiempoBloqueo()>1){
@@ -447,32 +451,49 @@ public class Modelo {
             //System.out.println("proceso :" + procesosIngresados.get(i)[0] + " estado: " + procesosIngresados.get(i)[7]);
         }
         if(procesoActual!=null){
-            for(int i=0; i<procesosIngresados.size(); i++){
-                if(procesosIngresados.get(i)[7]=="esperando"){
-                    final Task t = new Task(""+procesosIngresados.get(i)[0], new SimpleTimePeriod((int)procesosIngresados.get(i)[1], contadorCiclo));
-                    final Task t1 = new Task("esperando", new SimpleTimePeriod((int)procesosIngresados.get(i)[1],contadorCiclo));
-                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod(0, 0));
-                    t.addSubtask(t1);
-                    t.addSubtask(t2);
-                    s.add(t);
+            ArrayList<ArrayList<Object[]>>procesos=new ArrayList<>();
+            for(int i = 1; i< listaTurnos.getContador()+1; i++){
+                ArrayList<Object[]> limites = new ArrayList<>();
+                for(int j=0; j<procesosIngresados.size(); j++){
+                    Object[] aux = new Object[5];
+                    if((int)procesosIngresados.get(j)[8]==i){
+                        aux[0] = procesosIngresados.get(j)[1];
+                        aux[1] = procesosIngresados.get(j)[3];
+                        aux[2] = procesosIngresados.get(j)[4];
+                    }
+                    aux[3] = procesosIngresados.get(j)[7];
+                    aux[4] = "P"+procesosIngresados.get(j)[8];
                 }
-                if(procesosIngresados.get(i)[7]=="ejecutando"){
-                    //System.out.println("Pintando proceso en ejecucion");
-                    final Task t = new Task(""+procesosIngresados.get(i)[0], new SimpleTimePeriod((int)procesosIngresados.get(i)[1], contadorCiclo));
-                    final Task t1 = new Task("esperando", new SimpleTimePeriod((int)procesosIngresados.get(i)[1],(int)procesosIngresados.get(i)[3]));
-                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod((int)procesosIngresados.get(i)[3], contadorCiclo));
-                    t.addSubtask(t1);
-                    t.addSubtask(t2);
-                    s.add(t);
+                procesos.add(limites);
+            }
+            for(int i=0; i<procesos.size(); i++){
+                Task t = new Task("", new SimpleTimePeriod(0, 0));
+                ArrayList<Object[]> proceso= procesos.get(i);
+                for(int j=0; j<proceso.size(); j++){
+                    if(((Object[])proceso.get(j))[3]=="esperando"){
+                        t = new Task(""+((Object[])proceso.get(j))[4], new SimpleTimePeriod((int)((Object[])proceso.get(j))[0], contadorCiclo));
+                        final Task t1 = new Task("esperando", new SimpleTimePeriod((int)((Object[])proceso.get(j))[0],contadorCiclo));
+                        final Task t2 = new Task("ejecutando", new SimpleTimePeriod(0, 0));
+                        t.addSubtask(t1);
+                        t.addSubtask(t2);
+                    }
+                    if(((Object[])proceso.get(j))[3]=="ejecutando"){
+                        //System.out.println("Pintando proceso en ejecucion");
+                        t = new Task(""+((Object[])proceso.get(j))[4], new SimpleTimePeriod((int)((Object[])proceso.get(j))[0], contadorCiclo));
+                        final Task t1 = new Task("esperando", new SimpleTimePeriod((int)((Object[])proceso.get(j))[0],(int)((Object[])proceso.get(j))[1]));
+                        final Task t2 = new Task("ejecutando", new SimpleTimePeriod((int)((Object[])proceso.get(j))[1], contadorCiclo));
+                        t.addSubtask(t1);
+                        t.addSubtask(t2);
+                    }
+                    if(((Object[])proceso.get(j))[3]=="terminado"){
+                        t = new Task(""+((Object[])proceso.get(j))[4], new SimpleTimePeriod((int)((Object[])proceso.get(j))[0], contadorCiclo));
+                        final Task t1 = new Task("esperando", new SimpleTimePeriod((int)((Object[])proceso.get(j))[0],(int)((Object[])proceso.get(j))[1]));
+                        final Task t2 = new Task("ejecutando", new SimpleTimePeriod((int)((Object[])proceso.get(j))[1], (int)((Object[])proceso.get(j))[2]));
+                        t.addSubtask(t1);
+                        t.addSubtask(t2);
+                    }
                 }
-               if(procesosIngresados.get(i)[7]=="terminado"){
-                    final Task t = new Task(""+procesosIngresados.get(i)[0], new SimpleTimePeriod((int)procesosIngresados.get(i)[1], contadorCiclo));
-                    final Task t1 = new Task("esperando", new SimpleTimePeriod((int)procesosIngresados.get(i)[1],(int)procesosIngresados.get(i)[3]));
-                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod((int)procesosIngresados.get(i)[3], (int)procesosIngresados.get(i)[4]));
-                    t.addSubtask(t1);
-                    t.addSubtask(t2);
-                    s.add(t);
-                }
+                s.add(t);
             }
 
             model.add(s);
