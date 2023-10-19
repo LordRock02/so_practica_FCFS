@@ -44,20 +44,20 @@ public class MyRenderer extends GanttRenderer {
         int taskCount = tasks.get(col).getSubtaskCount();
         taskCount = Math.max(1, taskCount);
 
-        System.out.println("----> " + taskCount);
+        //System.out.println("----> " + taskCount);
         String description;
 
         for (int i = 0; i < taskCount; i++) {
             description = tasks.get(col).getSubtask(i).getDescription();
 
-            System.out.println(description + ": " + i);
+           // System.out.println(description + ": " + i);
             if (description.equals("ejecutando")) {
                 clut.add(Color.green);
-                System.out.println("green");
+                //System.out.println("green");
             }
             if (description.equals("esperando")) {
                 clut.add(Color.gray);
-                System.out.println("gray");
+                //System.out.println("gray");
             }
         }
     }

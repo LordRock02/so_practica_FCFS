@@ -43,22 +43,22 @@ public class Modelo {
     boolean sistemaActivo = false;
 
     private int[][] coordenadas = {
-            {270,470},
-            {440,470},
-            {610,470},
-            {780,470},
+            {270,370},
+            {440,370},
+            {610,370},
+            {780,370},
 
-            {780,270},
-            {610,270},
-            {440,270},
-            {270,270},
-            {100,270},
+            {780,170},
+            {610,170},
+            {440,170},
+            {270,170},
+            {100,170},
 
-            {100,70},
-            {270,70},
-            {440,70},
-            {610,70},
-            {780,70}
+            {100,10},
+            {270,10},
+            {440,10},
+            {610,10},
+            {780,10}
     };
 
     public TaskSeriesCollection model;
@@ -68,11 +68,34 @@ public class Modelo {
         getVistaPrincipal().setVisible(true);
         getVistaPrincipal().setLocationRelativeTo(null);
 
-        getVistaPrincipal().getPanelCola().setBackground(Color.red);
-        getVistaPrincipal().getPanelTabla().setBackground(Color.blue);
+       // getVistaPrincipal().getPanelCola().setBackground(Color.red);
+        //getVistaPrincipal().getPanelTabla().setBackground(Color.blue);
         this.pintarDiagramaGantt();
         this.insertarClientesIniciales();
     }
+    public void agregarCliente(){
+        int cantidadAgregar = Integer.parseInt(this.getVistaPrincipal().getTxtCantClientes().getText());
+        Object[] datos = new Object[8];
+        Proceso proceso;
+        for(int i=0;i<cantidadAgregar;i++){
+            this.listaTurnos.insertar();
+            this.listaTurnos.getUltimoEnLista().setTiempoLlegada(this.contadorCiclo);
+            proceso = this.listaTurnos.getUltimoEnLista();
+            System.out.println("proceso: " + proceso.getNombreProceso());
+            datos[0]= proceso.getNombreProceso();
+            datos[1]=contadorCiclo;
+            datos[2]=proceso.getRafagaRestante();
+            datos[3]=proceso.getTiempoComienzo();
+            datos[4]=proceso.getTiempoFinal();
+            datos[5]=proceso.getTiempoRetorno();
+            datos[6]=proceso.getTiempoEspera();
+            datos[7]="esperando";
+            this.procesosIngresados.add(datos);
+        }
+        pintarTabla();
+        pintarCola();
+    }
+
 
     public void insertarClientesIniciales(){
         //int cantClientes = (int)(Math.random()*10+1);
@@ -84,7 +107,7 @@ public class Modelo {
         ArrayList<Proceso> procesos = this.listaTurnos.listarNodos();
         //System.out.println("INSERTARCLIENTESINICIALES tamano:" + procesos.size());
         for(int i=0; i<procesos.size(); i++){
-            Object[] datos = new Object[9];
+            Object[] datos = new Object[8];
             //System.out.println("Proceso #: " + procesos.get(i).getIdProceso());
             datos[0]=procesos.get(i).getNombreProceso();
             datos[1]=procesos.get(i).getTiempoLlegada();
@@ -94,13 +117,8 @@ public class Modelo {
             datos[5]=procesos.get(i).getTiempoRetorno();
             datos[6]=procesos.get(i).getTiempoEspera();
             datos[7]="esperando";//procesos.get(i).getEstado();
-            datos[8]=new Task(""+procesos.get(i).getNombreProceso(), new SimpleTimePeriod(0, 50));
             this.procesosIngresados.add(datos);
         }
-        for(int i=0; i<this.procesosIngresados.size(); i++){
-            //System.out.println("Proceso #: " + procesosIngresados.get(i)[0]);
-        }
-        //this.procesosIngresados= this.listaTurnos;
         this.pintarCola();
         this.pintarTabla();
     }
@@ -111,12 +129,13 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo()){
                     listaTurnos.imprimirLista();
-                    while(!listaTurnos.isEmpty()){
+                    if(!listaTurnos.isEmpty()){
                         procesoActual = listaTurnos.getProcesoCajero().getSiguiente();
-                        for(int i = 0; i<listaTurnos.listarNodos().size(); i++){
-                            if(procesoActual.getTiempoLlegada()>listaTurnos.listarNodos().get(i).getTiempoLlegada()){
-                                procesoActual = listaTurnos.listarNodos().get(i);
-                                procesoActual.setEstado("ejecutando");
+                        procesoActual.setEstado("ejecutando");
+                        for(int i= 0; i<procesosIngresados.size(); i++){
+                            if(procesoActual.getNombreProceso() == procesosIngresados.get(i)[0]){
+                                procesosIngresados.get(i)[7]=procesoActual.getEstado();
+                                System.out.println("proceso :" + procesosIngresados.get(i)[0] + " estado: " + procesosIngresados.get(i)[7]);
                             }
                         }
                         String nombreProcesoActual=procesoActual.getNombreProceso();
@@ -176,6 +195,8 @@ public class Modelo {
                                     if(procesoActual.getNombreProceso()==procesosIngresados.get(j)[0]){
                                         procesosIngresados.get(j)[4]=procesoActual.getTiempoFinal();
                                         procesosIngresados.get(j)[5]=procesoActual.getTiempoRetorno();
+                                        procesosIngresados.get(j)[7]="terminado";
+                                        //System.out.println("proceso bloqueado: " + procesosIngresados.get(j)[0]+"estado: "+ procesosIngresados.get(j)[7] + " tiempo: " + (int)procesosIngresados.get(j)[4]);
                                     }
                                 }
                                 listaTurnos.atender(procesoActual);
@@ -194,13 +215,23 @@ public class Modelo {
                                 if(procesoActual.getNombreProceso()==procesosIngresados.get(j)[0]){
                                     procesosIngresados.get(j)[4]=procesoActual.getTiempoFinal();
                                     procesosIngresados.get(j)[5]=procesoActual.getTiempoRetorno();
+                                    procesosIngresados.get(j)[7]="terminado";
+                                   // System.out.println("proceso: " + procesosIngresados.get(j)[0]+" estado: "+ procesosIngresados.get(j)[7] + " tiempo: " + (int)procesosIngresados.get(j)[4]);
+
                                 }
                             }
                             listaTurnos.atender(procesoActual);
                         }
-                    }
+                    }else{
+                        try {
+                            Thread.sleep(cicloReloj);
+                            getVistaPrincipal().getLabelContadorCiclo().setText(contadorCiclo + "");
+                            contadorCiclo++;
 
-                    contadorReloj++;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
@@ -227,7 +258,7 @@ public class Modelo {
                             listaBloqueados.atender(proceso);
                             listaTurnos.insertar(proceso);
                             listaTurnos.getUltimoEnLista().setNombreProceso(listaTurnos.getUltimoEnLista().getNombreProceso()+"'");
-                            Object[] datos = new Object[9];
+                            Object[] datos = new Object[8];
                             datos[0]=listaTurnos.getUltimoEnLista().getNombreProceso();
                             datos[1]=contadorCiclo;
                             datos[2]=listaTurnos.getUltimoEnLista().getRafagaRestante();
@@ -236,7 +267,6 @@ public class Modelo {
                             datos[5]=0;
                             datos[6]=0;
                             datos[7]=listaTurnos.getUltimoEnLista().getEstado();
-                            datos[8]=new Task(""+listaTurnos.getUltimoEnLista().getNombreProceso(), new SimpleTimePeriod(0, 50));
                             procesosIngresados.add(datos);
                         }
                         else if(proceso.getTiempoBloqueo()>1){
@@ -255,7 +285,7 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo()){
                     try {
-                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
+                        Thread.sleep(200); // Agregar un retraso de 200 ms entre cada elemento
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -274,7 +304,7 @@ public class Modelo {
                 while(isSistemaActivo() ){
                     try {
 
-                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
+                        Thread.sleep(200); // Agregar un retraso de 200 ms entre cada elemento
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -302,28 +332,6 @@ public class Modelo {
             }
         });
         hiloPintarDiagramaGantt.start();
-    }
-    public void agregarCliente(){
-        int cantidadAgregar = Integer.parseInt(this.getVistaPrincipal().getTxtCantClientes().getText());
-        Object[] datos = new Object[9];
-        Proceso proceso;
-        for(int i=0;i<cantidadAgregar;i++){
-            this.listaTurnos.insertar();
-            this.listaTurnos.getUltimoEnLista().setTiempoFinal(this.listaTurnos.getUltimoEnLista().getTiempoFinal()+this.contadorCiclo);
-            proceso = this.listaTurnos.getUltimoEnLista();
-            datos[0]=proceso.getNombreProceso();
-            datos[1]=proceso.getTiempoLlegada();
-            datos[2]=proceso.getRafagaRestante();
-            datos[3]=proceso.getTiempoComienzo();
-            datos[4]=proceso.getTiempoFinal();
-            datos[5]=proceso.getTiempoRetorno();
-            datos[6]=proceso.getTiempoEspera();
-            datos[7]=proceso.getEstado();
-            datos[8]=new Task(""+proceso.getNombreProceso(), new SimpleTimePeriod(0, 50));
-            this.procesosIngresados.add(datos);
-        }
-        pintarTabla();
-        pintarCola();
     }
 
     public void atenderCliente(){
@@ -368,7 +376,7 @@ public class Modelo {
         getVistaPrincipal().getPanelCola().removeAll();
 
         JLabel labelCajero = new JLabel();
-        labelCajero.setBounds(60,450,140,150);
+        labelCajero.setBounds(60,350,140,150);
         labelCajero.setOpaque(true);
         //labelCajero.setBackground(Color.blue);
         labelCajero.setIcon(new ImageIcon(getClass().getResource("/imagenes/atm.png")));
@@ -391,7 +399,7 @@ public class Modelo {
                         "<p style='text-align:center;margin:0;font-size:9px;'>"+ proceso.getIdNodo()+""+"</p>"+
                         "<img style='margin-left:40px;' src="+ "'"+getClass().getResource("/imagenes/persona.png")+"'>" + "</img>"+
                         "<p style='text-align:center;margin:0;font-size:9px;'>"+ proceso.getNombreProceso()+""+"</p>" +
-                        "<p style='text-align:center;margin:0;font-size:9px;'>"+ proceso.getRafaga()+" Facturas"+"</p>" +
+                        "<p style='text-align:center;margin:0;font-size:9px;'>"+ proceso.getRafaga()+" Rafaga"+"</p>" +
                     "</div>"+
                     "</html>";
 
@@ -423,46 +431,44 @@ public class Modelo {
         range.setMaximumDate(new Date(100));
 
         // insertando diagrama de gantt al panel
-        final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setBounds(0, 720, 1000, 360);
-        this.getVistaPrincipal().add(chartPanel);
+        getVistaPrincipal().getChartPanel().setChart(chart);
 
         //GanttRenderer personnalisÃ©..
         MyRenderer renderer = new MyRenderer(model);
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(Color.WHITE);
-        chartPanel.repaint();
+        getVistaPrincipal().getChartPanel().repaint();
     }
     private IntervalCategoryDataset createSampleDataset() {
         model = new TaskSeriesCollection();
         final TaskSeries s = new TaskSeries("");
-        System.out.println("tamano :"+s.getTasks().size());
-        /*for(int i=0; i<this.procesosIngresados.size();i++){
-            if (procesosIngresados.get(i)[7]=="esperando") {
-                final Task t = new Task(""+procesoActual.getNombreProceso(), new SimpleTimePeriod(0, 50 + contadorCiclo));
-                final Task t1 = new Task("ejecutando", new SimpleTimePeriod(0,20));
-                final Task t2 = new Task("esperando", new SimpleTimePeriod(20, 50+contadorCiclo));
-                t.addSubtask(t1);
-                t.addSubtask(t2);
-                s.add(t);
-            }
-            if (procesosIngresados.get(i)[7]=="ejecutando") {
-                final Task t = new Task(""+procesoActual.getNombreProceso(), new SimpleTimePeriod(0, 50 + contadorCiclo));
-                final Task t1 = new Task("esperando", new SimpleTimePeriod(0,20));
-                final Task t2 = new Task("ejecutando", new SimpleTimePeriod(20, 50+contadorCiclo));
-                t.addSubtask(t1);
-                t.addSubtask(t2);
-                s.add(t);
-            }
-            model.add(s);
-        }*/
-
+        //System.out.println("tamano :"+s.getTasks().size());
+        for(int i=0; i<procesosIngresados.size(); i++){
+            //System.out.println("proceso :" + procesosIngresados.get(i)[0] + " estado: " + procesosIngresados.get(i)[7]);
+        }
         if(procesoActual!=null){
             for(int i=0; i<procesosIngresados.size(); i++){
                 if(procesosIngresados.get(i)[7]=="esperando"){
-                    final Task t = new Task(""+i, new SimpleTimePeriod((int)procesosIngresados.get(i)[1], 50 + contadorCiclo));
-                    final Task t1 = new Task("esperando", new SimpleTimePeriod(0,20));
-                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod(20, 50+contadorCiclo));
+                    final Task t = new Task(""+procesosIngresados.get(i)[0], new SimpleTimePeriod((int)procesosIngresados.get(i)[1], contadorCiclo));
+                    final Task t1 = new Task("esperando", new SimpleTimePeriod((int)procesosIngresados.get(i)[1],contadorCiclo));
+                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod(0, 0));
+                    t.addSubtask(t1);
+                    t.addSubtask(t2);
+                    s.add(t);
+                }
+                if(procesosIngresados.get(i)[7]=="ejecutando"){
+                    //System.out.println("Pintando proceso en ejecucion");
+                    final Task t = new Task(""+procesosIngresados.get(i)[0], new SimpleTimePeriod((int)procesosIngresados.get(i)[1], contadorCiclo));
+                    final Task t1 = new Task("esperando", new SimpleTimePeriod((int)procesosIngresados.get(i)[1],(int)procesosIngresados.get(i)[3]));
+                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod((int)procesosIngresados.get(i)[3], contadorCiclo));
+                    t.addSubtask(t1);
+                    t.addSubtask(t2);
+                    s.add(t);
+                }
+               if(procesosIngresados.get(i)[7]=="terminado"){
+                    final Task t = new Task(""+procesosIngresados.get(i)[0], new SimpleTimePeriod((int)procesosIngresados.get(i)[1], contadorCiclo));
+                    final Task t1 = new Task("esperando", new SimpleTimePeriod((int)procesosIngresados.get(i)[1],(int)procesosIngresados.get(i)[3]));
+                    final Task t2 = new Task("ejecutando", new SimpleTimePeriod((int)procesosIngresados.get(i)[3], (int)procesosIngresados.get(i)[4]));
                     t.addSubtask(t1);
                     t.addSubtask(t2);
                     s.add(t);

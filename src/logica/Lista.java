@@ -6,6 +6,8 @@ public class Lista {
   private Proceso procesoCajero;
   private int tamano = 0;
 
+  private int contador = 0;
+
   public Lista() {
     this.procesoCajero = new Proceso(tamano);
     this.procesoCajero.setSiguiente(procesoCajero);
@@ -13,7 +15,7 @@ public class Lista {
 
   public void insertar() {
     tamano++;
-    Proceso procesoNuevo = new Proceso(tamano);
+    Proceso procesoNuevo = new Proceso(++contador);
     Proceso procesoAuxiliar = procesoCajero;
     while (procesoAuxiliar.getSiguiente() != procesoCajero) {
       procesoAuxiliar = procesoAuxiliar.getSiguiente();
