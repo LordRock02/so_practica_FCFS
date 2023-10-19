@@ -10,6 +10,7 @@ public class Proceso {
 
   public Proceso(int id){
     this.idProceso = id;
+    this.nombreProceso = "P" + id;
     this.rafaga= (int)(Math.random()*10+1);
     this.rafagaRestante=this.rafaga;
     this.tiempoLlegada = (int)(Math.random()*10+1);

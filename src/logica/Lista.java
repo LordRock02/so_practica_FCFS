@@ -20,10 +20,10 @@ public class Lista {
     }
     procesoAuxiliar.setSiguiente(procesoNuevo);
     procesoNuevo.setSiguiente(procesoCajero);
- 
+
   }
 
-  public void removerProcesoEspecifico(Proceso procesoRemover){
+  public void atender(Proceso procesoRemover){
     Proceso procesoAuxiliar = procesoCajero;
     while (procesoAuxiliar.getSiguiente() != procesoCajero) {
       if(procesoAuxiliar.getSiguiente()==procesoRemover){
@@ -33,6 +33,17 @@ public class Lista {
       }
       procesoAuxiliar = procesoAuxiliar.getSiguiente();
     }
+  }
+
+  public Proceso getUltimoEnLista(){
+    Proceso proceso = this.procesoCajero.getSiguiente();
+    if(proceso!=this.procesoCajero){
+      while(proceso.getSiguiente()!=this.procesoCajero){
+        proceso=proceso.getSiguiente();
+      }
+      return proceso;
+    }
+    return null;
   }
 
   public void insertar(Proceso procesoNuevo){
@@ -70,6 +81,9 @@ public class Lista {
     }
 
     System.out.println(lista);
+  }
+  public boolean isEmpty(){
+    return (this.procesoCajero.getSiguiente()==this.procesoCajero);
   }
 
   public int getTamano() {

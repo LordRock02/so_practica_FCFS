@@ -1,18 +1,21 @@
 package presentacion;
 
+import org.jfree.ui.ApplicationFrame;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 
-public class VentanaPrincipal extends JFrame {
+public class VentanaPrincipal extends ApplicationFrame {
 
     private Modelo modelo;
     private ControladorVentanaPrincipal control;
 
     private JPanel panelCola;
     private JPanel panelTabla;
+    private JPanel diagramaGantt;
     private JTextField txtCantClientes;
     private JTextField txtCantAtender;
     private JButton btnAgregarClientes;
@@ -28,10 +31,13 @@ public class VentanaPrincipal extends JFrame {
     JScrollPane scrollPaneTiempos,scrollPaneBloqueados;
     JLabel labelCajero;
     JLabel labelAccion;
+
+    private JLabel labelContadorCiclo;
     public VentanaPrincipal(Modelo modelo) {
         super("Sistema Cola Cajero");
         this.modelo=modelo;
         // Establecer el título de la ventana
+        this.setLayout(null);
         inicializarComponentes();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         capturarEventos();
@@ -60,34 +66,38 @@ public class VentanaPrincipal extends JFrame {
         this.getPanelCola().setLayout(null);
 
         this.panelTabla = new JPanel();
-        this.panelTabla.setBounds(1000,0,280,720);
+        this.panelTabla.setBounds(1000,0,1000,1080);
         this.getPanelTabla().setLayout(null);
+
+        /*this.diagramaGantt = new JPanel();
+        this.diagramaGantt.setBounds(0, 720, 2000, 360);
+        this.getDiagramaGantt().setLayout(null);*/
 
 
         //Botones
 
         this.btnAtender = new JButton("ATENDER");
-        this.btnAtender.setBounds(1480,750,120,40);
+        this.btnAtender.setBounds(440,750,120,40);
         this.btnAtender.setFont(fontButton);
 
         this.btnAgregarClientes = new JButton("AGREGAR");
-        this.btnAgregarClientes.setBounds(1480,800,120,40);
+        this.btnAgregarClientes.setBounds(440,800,120,40);
         this.btnAgregarClientes.setFont(fontButton);
 
         this.btnIniciarDetener = new JButton("INICIAR");
-        this.btnIniciarDetener.setBounds(1450,850,120,40);
+        this.btnIniciarDetener.setBounds(440,850,120,40);
         this.btnIniciarDetener.setFont(fontButton);
 
         //TextFields
 
         this.txtCantAtender = new JTextField();
-        this.txtCantAtender.setBounds(1420,750,50,40);
+        this.txtCantAtender.setBounds(370,750,50,40);
         this.txtCantAtender.setHorizontalAlignment(JTextField.CENTER);
         this.txtCantAtender.setText("1");
         this.txtCantAtender.setFont(this.fontButton);
 
         this.txtCantClientes = new JTextField();
-        this.txtCantClientes.setBounds(1420,800,50,40);
+        this.txtCantClientes.setBounds(370,800,50,40);
         this.txtCantClientes.setHorizontalAlignment(JTextField.CENTER);
         this.txtCantClientes.setText("1");
         this.txtCantClientes.setFont(this.fontButton);
@@ -99,8 +109,14 @@ public class VentanaPrincipal extends JFrame {
         this.labelCajero.setIcon(new ImageIcon(getClass().getResource("/imagenes/atm.png")));
 
         this.labelAccion = new JLabel();
-        this.labelAccion.setBounds(1490,900,120,40);
+        this.labelAccion.setBounds(440,900,120,40);
         this.labelAccion.setText("Accion");
+
+        this.labelContadorCiclo = new JLabel();
+        this.labelContadorCiclo.setBounds(440, 970, 120, 40);
+        this.labelContadorCiclo.setHorizontalTextPosition(SwingConstants.CENTER);
+        this.labelContadorCiclo.setForeground(Color.WHITE);
+
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -129,7 +145,7 @@ public class VentanaPrincipal extends JFrame {
         }
 
         scrollPaneTiempos = new JScrollPane(tablaTiempos);
-        scrollPaneTiempos.setBounds(1150,40,703,400);
+        scrollPaneTiempos.setBounds(148,40,703,400);
 
         //Tabla bloqueados
 
@@ -151,7 +167,7 @@ public class VentanaPrincipal extends JFrame {
         }
 
         scrollPaneBloqueados = new JScrollPane(tablaBloqueados);
-        scrollPaneBloqueados.setBounds(1400,500,228,200);
+        scrollPaneBloqueados.setBounds(386,500,228,200);
 
 
         // Agregar elementos a los paneles
@@ -166,9 +182,11 @@ public class VentanaPrincipal extends JFrame {
 
         this.panelCola.add(this.labelCajero);
         this.panelTabla.add(this.labelAccion);
+        this.panelTabla.add(this.labelContadorCiclo);
 
         this.add(panelCola);
         this.add(panelTabla);
+        //this.add(diagramaGantt);
     }
 
     public DefaultTableModel getModelTablaTiempos() {
@@ -186,6 +204,8 @@ public class VentanaPrincipal extends JFrame {
     public JPanel getPanelTabla() {
         return panelTabla;
     }
+
+    public JPanel getDiagramaGantt() { return diagramaGantt; }
 
     public JTextField getTxtCantClientes() {
         return txtCantClientes;
@@ -207,5 +227,9 @@ public class VentanaPrincipal extends JFrame {
         this.btnAtender.addActionListener(getControl());
         this.btnAgregarClientes.addActionListener(getControl());
         this.btnIniciarDetener.addActionListener(getControl());
+    }
+
+    public JLabel getLabelContadorCiclo() {
+        return labelContadorCiclo;
     }
 }
