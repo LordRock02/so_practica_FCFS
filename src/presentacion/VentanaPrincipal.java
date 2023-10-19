@@ -1,5 +1,8 @@
 package presentacion;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.ui.ApplicationFrame;
 
 import javax.swing.*;
@@ -25,6 +28,7 @@ public class VentanaPrincipal extends ApplicationFrame {
     JTable tablaTiempos;
     JTable tablaBloqueados;
 
+    ChartPanel chartPanel;
     Font fontButton;
     Font fontLabel;
 
@@ -56,8 +60,21 @@ public class VentanaPrincipal extends ApplicationFrame {
 
     public void inicializarComponentes(){
 
+        JFreeChart chart = ChartFactory.createGanttChart(
+                "Diagrama de Gantt", // chart title
+                "Procesos", // domain axis label
+                "Tiempo", // range axis label
+                null, // data
+                false, // include legend
+                true, // tooltips
+                false // urls
+        );
+
+        chartPanel = new ChartPanel(chart);
+        this.chartPanel.setBounds(0, 720, 1000, 360);
+
         this.fontButton = new Font("Roboto", Font.BOLD, 15);
-        this.fontLabel = new Font("Roboto", Font.BOLD, 25);
+        this.fontLabel = new Font("Roboto", Font.BOLD, 20);
 
         //Paneles
 
@@ -104,11 +121,12 @@ public class VentanaPrincipal extends ApplicationFrame {
 
         //Label
         this.labelCajero = new JLabel();
-        this.labelCajero.setBounds(60,450,140,150);
+        this.labelCajero.setBounds(60,350,140,150);
         this.labelCajero.setOpaque(true);
         this.labelCajero.setIcon(new ImageIcon(getClass().getResource("/imagenes/atm.png")));
 
         this.labelAccion = new JLabel();
+        this.labelAccion.setFont(this.fontLabel);
         this.labelAccion.setBounds(440,900,120,40);
         this.labelAccion.setText("Accion");
 
@@ -172,13 +190,15 @@ public class VentanaPrincipal extends ApplicationFrame {
 
         // Agregar elementos a los paneles
 
+        this.add(this.chartPanel);
+
         this.panelTabla.add(this.scrollPaneTiempos);
         this.panelTabla.add(this.scrollPaneBloqueados);
-        this.panelTabla.add(this.btnAtender);
+        //this.panelTabla.add(this.btnAtender);
         this.panelTabla.add(this.btnAgregarClientes);
         this.panelTabla.add(this.btnIniciarDetener);
         this.panelTabla.add(this.txtCantClientes);
-        this.panelTabla.add(this.txtCantAtender);
+        //this.panelTabla.add(this.txtCantAtender);
 
         this.panelCola.add(this.labelCajero);
         this.panelTabla.add(this.labelAccion);
@@ -221,6 +241,10 @@ public class VentanaPrincipal extends ApplicationFrame {
 
     public JButton getBtnIniciarDetener() {
         return btnIniciarDetener;
+    }
+
+    public ChartPanel getChartPanel() {
+        return this.chartPanel;
     }
 
     private void capturarEventos() {

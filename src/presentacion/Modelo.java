@@ -43,22 +43,22 @@ public class Modelo {
     boolean sistemaActivo = false;
 
     private int[][] coordenadas = {
-            {270,470},
-            {440,470},
-            {610,470},
-            {780,470},
+            {270,370},
+            {440,370},
+            {610,370},
+            {780,370},
 
-            {780,270},
-            {610,270},
-            {440,270},
-            {270,270},
-            {100,270},
+            {780,170},
+            {610,170},
+            {440,170},
+            {270,170},
+            {100,170},
 
-            {100,70},
-            {270,70},
-            {440,70},
-            {610,70},
-            {780,70}
+            {100,10},
+            {270,10},
+            {440,10},
+            {610,10},
+            {780,10}
     };
 
     public TaskSeriesCollection model;
@@ -68,15 +68,15 @@ public class Modelo {
         getVistaPrincipal().setVisible(true);
         getVistaPrincipal().setLocationRelativeTo(null);
 
-        getVistaPrincipal().getPanelCola().setBackground(Color.red);
-        getVistaPrincipal().getPanelTabla().setBackground(Color.blue);
+        //getVistaPrincipal().getPanelCola().setBackground(Color.red);
+        //getVistaPrincipal().getPanelTabla().setBackground(Color.blue);
         this.pintarDiagramaGantt();
         this.insertarClientesIniciales();
     }
 
     public void insertarClientesIniciales(){
         //int cantClientes = (int)(Math.random()*10+1);
-        int cantClientes = 5;
+        int cantClientes = 20;
         for(int i=0;i<cantClientes;i++){
             this.listaTurnos.insertar();
             this.listaTurnos.getUltimoEnLista().setTiempoLlegada(0);
@@ -111,14 +111,14 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo()){
                     listaTurnos.imprimirLista();
-                    while(!listaTurnos.isEmpty()){
+                    if(!listaTurnos.isEmpty()){
                         procesoActual = listaTurnos.getProcesoCajero().getSiguiente();
-                        for(int i = 0; i<listaTurnos.listarNodos().size(); i++){
-                            if(procesoActual.getTiempoLlegada()>listaTurnos.listarNodos().get(i).getTiempoLlegada()){
-                                procesoActual = listaTurnos.listarNodos().get(i);
-                                procesoActual.setEstado("ejecutando");
-                            }
-                        }
+                        //for(int i = 0; i<listaTurnos.listarNodos().size(); i++){
+                        //    if(procesoActual.getTiempoLlegada()>listaTurnos.listarNodos().get(i).getTiempoLlegada()){
+                        //        procesoActual = listaTurnos.listarNodos().get(i);
+                        //        procesoActual.setEstado("ejecutando");
+                        //    }
+                        //}
                         String nombreProcesoActual=procesoActual.getNombreProceso();
                         procesoActual.setTiempoComienzo(contadorCiclo);
                         procesoActual.setTiempoEspera(procesoActual.getTiempoComienzo()-procesoActual.getTiempoLlegada());
@@ -178,7 +178,7 @@ public class Modelo {
                                         procesosIngresados.get(j)[5]=procesoActual.getTiempoRetorno();
                                     }
                                 }
-                                listaTurnos.atender(procesoActual);
+                                listaTurnos.atender();
                                 eliminadoPorBloqueo = true;
                                 listaBloqueados.insertar(procesoActual);
                                 //System.out.println("rompe break");
@@ -196,11 +196,18 @@ public class Modelo {
                                     procesosIngresados.get(j)[5]=procesoActual.getTiempoRetorno();
                                 }
                             }
-                            listaTurnos.atender(procesoActual);
+                            listaTurnos.atender();
                         }
                     }
+                    else{
+                        try {
+                            Thread.sleep(cicloReloj);
+                            contadorCiclo++;
 
-                    contadorReloj++;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
@@ -255,7 +262,7 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo()){
                     try {
-                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
+                        Thread.sleep(300); // Agregar un retraso de 200 ms entre cada elemento
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -273,8 +280,7 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo() ){
                     try {
-
-                        Thread.sleep(100); // Agregar un retraso de 200 ms entre cada elemento
+                        Thread.sleep(300); // Agregar un retraso de 200 ms entre cada elemento
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -291,8 +297,7 @@ public class Modelo {
             public void run() {
                 while(isSistemaActivo() ){
                     try {
-
-                        Thread.sleep(contadorCiclo); // Agregar un retraso de 200 ms entre cada elemento
+                        Thread.sleep(200); // Agregar un retraso de 200 ms entre cada elemento
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -339,7 +344,8 @@ public class Modelo {
 
 
         this.getVistaPrincipal().getModelTablaTiempos().setRowCount(0);
-        for(int i = 0; i< procesosIngresados.size(); i++){
+        int sizeProcesosIngresados = procesosIngresados.size();
+        for(int i = 0; i< sizeProcesosIngresados; i++){
             this.getVistaPrincipal().getModelTablaTiempos().addRow(new Object[]{
                     procesosIngresados.get(i)[0],
                     procesosIngresados.get(i)[1],
@@ -347,7 +353,7 @@ public class Modelo {
                     procesosIngresados.get(i)[3],
                     procesosIngresados.get(i)[4],
                     procesosIngresados.get(i)[5],
-                    procesosIngresados.get(i)[6],
+                    procesosIngresados.get(i)[6]
             });
         }
 
@@ -368,7 +374,7 @@ public class Modelo {
         getVistaPrincipal().getPanelCola().removeAll();
 
         JLabel labelCajero = new JLabel();
-        labelCajero.setBounds(60,450,140,150);
+        labelCajero.setBounds(60,350,140,150);
         labelCajero.setOpaque(true);
         //labelCajero.setBackground(Color.blue);
         labelCajero.setIcon(new ImageIcon(getClass().getResource("/imagenes/atm.png")));
@@ -406,32 +412,31 @@ public class Modelo {
 
     }
     public void pintarDiagramaGantt(){
-        final IntervalCategoryDataset dataset = createSampleDataset();
+        IntervalCategoryDataset dataset = createSampleDataset();
         // create the chart...
-        final JFreeChart chart = ChartFactory.createGanttChart(
+        JFreeChart chart = ChartFactory.createGanttChart(
                 "Diagrama de Gantt", // chart title
-                "procesos", // domain axis label
-                "tiempo", // range axis label
+                "Procesos", // domain axis label
+                "Tiempo", // range axis label
                 dataset, // data
                 false, // include legend
                 true, // tooltips
                 false // urls
         );
-        final CategoryPlot plot = (CategoryPlot) chart.getPlot();
+
+        CategoryPlot plot = (CategoryPlot) chart.getPlot();
         DateAxis range = (DateAxis) plot.getRangeAxis();
         range.setDateFormatOverride(new SimpleDateFormat("S"));
         range.setMaximumDate(new Date(100));
 
         // insertando diagrama de gantt al panel
-        final ChartPanel chartPanel = new ChartPanel(chart);
-        chartPanel.setBounds(0, 720, 1000, 360);
-        this.getVistaPrincipal().add(chartPanel);
+        this.getVistaPrincipal().getChartPanel().setChart(chart);
 
         //GanttRenderer personnalisÃ©..
         MyRenderer renderer = new MyRenderer(model);
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(Color.WHITE);
-        chartPanel.repaint();
+        this.getVistaPrincipal().getChartPanel().repaint();
     }
     private IntervalCategoryDataset createSampleDataset() {
         model = new TaskSeriesCollection();
